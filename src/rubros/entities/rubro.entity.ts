@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Producto } from "src/productos/entities/producto.entity";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Rubro {
@@ -7,4 +8,11 @@ export class Rubro {
 
     @Column()
     name: string
+
+    @OneToMany(
+        () => Producto,
+        (Producto) => Producto.category,
+        {cascade:true}
+    )
+    products: Producto
 }

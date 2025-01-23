@@ -1,11 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRubroDto } from './dto/create-rubro.dto';
 import { UpdateRubroDto } from './dto/update-rubro.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Rubro } from './entities/rubro.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class RubrosService {
-  create(createRubroDto: CreateRubroDto) {
-    return 'This action adds a new rubro';
+
+  constructor(
+    @InjectRepository(Rubro)
+    private readonly categoryRepository: Repository<Rubro>
+  ) {}
+
+  async create(createRubroDto: CreateRubroDto) {
+    const category = this.categoryRepository.create(createRubroDto)
+    await this.categoryRepository.save(category)
+
+    return category
   }
 
   findAll() {

@@ -98,6 +98,7 @@ export class Marca {
 
 ```ts
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { MarcasService } from './marcas.service';
 import { MarcasController } from './marcas.controller';
 import { Marca } from './entities/marca.entity';
@@ -106,8 +107,96 @@ import { Marca } from './entities/marca.entity';
   controllers: [MarcasController],
   providers: [MarcasService],
   imports: [
-    Marca
+    TypeOrmModule.forFeature([
+      Marca
+    ])
+    
   ]
 })
 export class MarcasModule {}
+```
+
+6. Create relations
+
+`marca.entity`
+```ts
+@OneToMany(
+        () => Producto,
+        (Producto) => Producto.brand,
+        { cascade: true }
+    )
+    Products: Producto
+```    
+
+`productos.entity`
+```ts
+@ManyToOne(
+        () => Marca,
+        (Marca) => Marca.Products
+
+    )
+    brand: Marca
+```
+
+7. Install library class validators
+
+`npm i class-validator class-transformer` 
+
+ configure global Pipes
+```ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  //app.setGlobalPrefix('name_route');
+
+  app.useGlobalPipes(  
+    new ValidationPipe({ 
+      whitelist: true, 
+      forbidNonWhitelisted: true, 
+    }) 
+  );
+
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+8. Configure create DTO
+
+```ts
+import { IsString, MinLength } from "class-validator";
+
+
+export class CreateMarcaDto {
+    
+    @IsString()
+    @MinLength(1)
+    name: string
+}
+```
+
+9. CRUD
+
+Create
+```ts
+constructor(
+    @InjectRepository(Barrio)
+    private readonly neighborhoodRepository: Repository<Barrio>
+  ){}
+
+async create(createBarrioDto: CreateBarrioDto) {
+    try{
+      const neighborhood = this.neighborhoodRepository.create(createBarrioDto);
+      await this.neighborhoodRepository.save(neighborhood);
+
+      return neighborhood
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
 ```

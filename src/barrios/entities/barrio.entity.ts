@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Proveedore } from "src/proveedores/entities/proveedore.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Barrio {
@@ -9,4 +10,11 @@ export class Barrio {
         unique: true        
     })
     name: string
+
+    @OneToMany(
+        (type) => Proveedore,
+        (Proveedore) => Proveedore.neighborhood,
+        { cascade: true }
+    )
+    suppliers: Proveedore
 }

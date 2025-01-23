@@ -1,10 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Producto } from "src/productos/entities/producto.entity";
+import { Proveedore } from "src/proveedores/entities/proveedore.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class ProductosProveedore {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    // cod_prod
-    // cod_prov
+    @ManyToOne(
+        () => Proveedore,
+        (Proveedore) => Proveedore.products_suppliers
+    )
+    suppliers: Proveedore
+
+    @ManyToOne(
+        () => Producto,
+        (Producto) => Producto.products_suppliers
+    )
+    products: Producto
 }
