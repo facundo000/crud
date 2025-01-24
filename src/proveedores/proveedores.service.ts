@@ -37,7 +37,8 @@ export class ProveedoresService {
   }
 
   findAll() {
-    return `This action returns all proveedores`;
+    const suppliers = this.suppliersRepository.find()
+    return suppliers;
   }
 
   findOne(id: number) {

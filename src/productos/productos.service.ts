@@ -47,7 +47,9 @@ export class ProductosService {
   }
 
   findAll() {
-    return `This action returns all productos`;
+    const product = this.productRepository.find()
+
+    return product;
   }
 
   findOne(id: number) {

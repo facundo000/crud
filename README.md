@@ -208,7 +208,7 @@ export class CreateProductoDto {
 
 9. CRUD
 
-Create
+create
 
 `marcas.service.ts`
 ```ts
@@ -310,3 +310,30 @@ import { Rubro } from 'src/rubros/entities/rubro.entity';
 })
 export class ProductosModule {}
 ```
+findAll
+
+`marcas.service.ts`
+```ts
+constructor(
+    @InjectRepository(Barrio)
+    private readonly neighborhoodRepository: Repository<Barrio>
+  ){}
+
+async create(createBarrioDto: CreateBarrioDto) {
+    try{
+      const neighborhood = this.neighborhoodRepository.create(createBarrioDto);
+      await this.neighborhoodRepository.save(neighborhood);
+
+      return neighborhood
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  findAll() {
+    const brand = this.brandRepository.find()
+    return brand;
+  }
+```
+

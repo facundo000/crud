@@ -26,7 +26,8 @@ export class BarriosService {
   }
 
   findAll() {
-    return `This action returns all barrios`;
+    const neighborhoods = this.neighborhoodRepository.find()
+    return neighborhoods;
   }
 
   findOne(id: number) {

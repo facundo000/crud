@@ -21,7 +21,9 @@ export class RubrosService {
   }
 
   findAll() {
-    return `This action returns all rubros`;
+    const category = this.categoryRepository.find()
+
+    return category;
   }
 
   findOne(id: number) {
