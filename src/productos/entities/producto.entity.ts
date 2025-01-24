@@ -8,7 +8,7 @@ export class Producto {
     @PrimaryGeneratedColumn('uuid')
     cod_product: string;
 
-    @Column('text')
+    @Column('text', { nullable: true})
     description: string
 
     @ManyToOne(
@@ -16,17 +16,17 @@ export class Producto {
         (Marca) => Marca.Products
 
     )
-    brand: Marca
+    id_brand: Marca
 
     @ManyToOne(
         () => Rubro,
         (Rubro) => Rubro.products
     )
-    category: Rubro
+    id_category: Rubro
 
     @OneToMany(
         () => ProductosProveedore,
-        (ProductosProveedore) => ProductosProveedore.products,
+        (ProductosProveedore) => ProductosProveedore.id_products,
         { cascade: true }
     )
     products_suppliers: ProductosProveedore

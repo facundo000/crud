@@ -3,6 +3,8 @@ import { ProductosService } from './productos.service';
 import { ProductosController } from './productos.controller';
 import { Producto } from './entities/producto.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Marca } from 'src/marcas/entities/marca.entity';
+import { Rubro } from 'src/rubros/entities/rubro.entity';
 
 @Module({
   controllers: [ProductosController],
@@ -10,7 +12,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     TypeOrmModule.forFeature([
 
-      Producto
+      Producto,
+      Marca,
+      Rubro
     ])
   ]
 })

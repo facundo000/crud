@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsOptional, IsPositive, IsString, MinLength } from "class-validator";
+import { IsEmail, IsNumber, IsOptional, IsPositive, IsString, IsUUID, MinLength } from "class-validator";
 
 
 
@@ -14,10 +14,12 @@ export class CreateProveedoreDto {
 
     @IsNumber()
     @IsPositive()
-    @IsOptional()
     phone: string
+
+    @IsUUID()
+    id_neighborhood: string
 
     @IsEmail()
     @IsOptional()
-    mail: string
+    mail?: string
 }

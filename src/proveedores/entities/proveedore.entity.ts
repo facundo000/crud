@@ -19,11 +19,11 @@ export class Proveedore {
         (type) => Barrio,
         (Barrio) => Barrio.suppliers
     )
-    neighborhood: Barrio
+    id_neighborhood: Barrio
 
     @OneToMany(
         () => ProductosProveedore,
-        (ProductosProveedore) => ProductosProveedore.suppliers,
+        (ProductosProveedore) => ProductosProveedore.id_suppliers,
         { cascade: true }
     )
     products_suppliers: ProductosProveedore
@@ -31,6 +31,6 @@ export class Proveedore {
     @Column('text')
     phone: string
 
-    @Column()
-    mail: string
+    @Column({nullable: true})
+    mail?: string
 }

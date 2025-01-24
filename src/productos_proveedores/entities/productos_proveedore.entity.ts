@@ -11,11 +11,11 @@ export class ProductosProveedore {
         () => Proveedore,
         (Proveedore) => Proveedore.products_suppliers
     )
-    suppliers: Proveedore
+    id_suppliers: Proveedore
 
     @ManyToOne(
         () => Producto,
         (Producto) => Producto.products_suppliers
     )
-    products: Producto
+    id_products: Producto
 }

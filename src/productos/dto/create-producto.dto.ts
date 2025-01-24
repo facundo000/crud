@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsPositive, IsString, MinLength } from "class-validator";
+import { IsNumber, IsOptional, IsPositive, IsString, IsUUID, MinLength } from "class-validator";
 
 
 export class CreateProductoDto {
@@ -11,4 +11,10 @@ export class CreateProductoDto {
     @IsNumber()
     @IsPositive()
     price: number
+
+    @IsUUID()
+    id_brand: string
+
+    @IsUUID()
+    id_category: string
 }

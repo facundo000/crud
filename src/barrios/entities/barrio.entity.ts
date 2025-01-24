@@ -13,7 +13,7 @@ export class Barrio {
 
     @OneToMany(
         (type) => Proveedore,
-        (Proveedore) => Proveedore.neighborhood,
+        (Proveedore) => Proveedore.id_neighborhood,
         { cascade: true }
     )
     suppliers: Proveedore

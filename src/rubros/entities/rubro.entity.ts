@@ -11,7 +11,7 @@ export class Rubro {
 
     @OneToMany(
         () => Producto,
-        (Producto) => Producto.category,
+        (Producto) => Producto.id_category,
         {cascade:true}
     )
     products: Producto

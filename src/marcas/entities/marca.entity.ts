@@ -13,7 +13,7 @@ export class Marca {
 
     @OneToMany(
         () => Producto,
-        (Producto) => Producto.brand,
+        (Producto) => Producto.id_brand,
         { cascade: true }
     )
     Products: Producto

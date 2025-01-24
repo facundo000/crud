@@ -122,7 +122,7 @@ export class MarcasModule {}
 ```ts
 @OneToMany(
         () => Producto,
-        (Producto) => Producto.brand,
+        (Producto) => Producto.id_brand,
         { cascade: true }
     )
     Products: Producto
@@ -135,7 +135,7 @@ export class MarcasModule {}
         (Marca) => Marca.Products
 
     )
-    brand: Marca
+    id_brand: Marca
 ```
 
 7. Install library class validators
@@ -167,6 +167,8 @@ bootstrap();
 
 8. Configure create DTO
 
+`create-marca-dto.ts`
+
 ```ts
 import { IsString, MinLength } from "class-validator";
 
@@ -179,9 +181,36 @@ export class CreateMarcaDto {
 }
 ```
 
+`create-marca-dto.ts`
+
+```ts
+import { IsNumber, IsOptional, IsPositive, IsString, IsUUID, MinLength } from "class-validator";
+
+
+export class CreateProductoDto {
+
+    @IsString()
+    @MinLength(5)
+    @IsOptional()
+    description ?: string
+
+    @IsNumber()
+    @IsPositive()
+    price: number
+
+    @IsUUID()
+    id_brand: string
+
+    @IsUUID()
+    id_category: string
+}
+```
+
 9. CRUD
 
 Create
+
+`marcas.service.ts`
 ```ts
 constructor(
     @InjectRepository(Barrio)
@@ -199,4 +228,85 @@ async create(createBarrioDto: CreateBarrioDto) {
       console.log(error)
     }
   }
+```
+`productos.service.ts`
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { CreateProductoDto } from './dto/create-producto.dto';
+import { UpdateProductoDto } from './dto/update-producto.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Producto } from './entities/producto.entity';
+import { Repository } from 'typeorm';
+import { Marca } from 'src/marcas/entities/marca.entity';
+import { Rubro } from 'src/rubros/entities/rubro.entity';
+
+@Injectable()
+export class ProductosService {
+
+  constructor(
+    @InjectRepository(Producto)
+    private readonly productRepository: Repository<Producto>,
+    @InjectRepository(Marca)
+    private readonly brandRepository: Repository<Marca>,
+    @InjectRepository(Rubro)
+    private readonly categoryRepository: Repository<Rubro>
+
+  ) {}
+
+  async create(createProductoDto: CreateProductoDto) {
+    const { id_brand, id_category, ...rest } = createProductoDto;
+
+    //PK: id is identity of table Marca-Rubro
+    //FK: id_brand-id_category is identity of table Producto
+    const brandEntity = await this.brandRepository.findOne({
+      where: { id: id_brand }       
+    })
+    const categoryEntity = await this.categoryRepository.findOne({
+      where: { id: id_category }
+    })
+
+    if(!brandEntity || !categoryEntity){
+      throw new Error("brand or category not found");
+    }
+
+    const product = this.productRepository.create({
+      ...rest,
+      id_brand: brandEntity,
+      id_category: categoryEntity,
+    });
+    await this.productRepository.save(product);
+
+    return product;
+  }
+
+}
+
+```
+import in module
+
+`productos.module.ts`
+
+```ts
+import { Module } from '@nestjs/common';
+import { ProductosService } from './productos.service';
+import { ProductosController } from './productos.controller';
+import { Producto } from './entities/producto.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Marca } from 'src/marcas/entities/marca.entity';
+import { Rubro } from 'src/rubros/entities/rubro.entity';
+
+@Module({
+  controllers: [ProductosController],
+  providers: [ProductosService],
+  imports: [
+    TypeOrmModule.forFeature([
+
+      Producto,
+      Marca,
+      Rubro
+    ])
+  ]
+})
+export class ProductosModule {}
 ```
