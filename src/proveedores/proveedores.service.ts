@@ -37,7 +37,9 @@ export class ProveedoresService {
   }
 
   findAll() {
-    const suppliers = this.suppliersRepository.find()
+    const suppliers = this.suppliersRepository.find({
+      relations: ['id_neighborhood']
+    })
     return suppliers;
   }
 

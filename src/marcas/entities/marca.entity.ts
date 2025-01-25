@@ -16,6 +16,6 @@ export class Marca {
         (Producto) => Producto.id_brand,
         { cascade: true }
     )
-    Products: Producto
+    products: Producto
 }
 

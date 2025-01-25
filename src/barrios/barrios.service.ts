@@ -25,9 +25,15 @@ export class BarriosService {
     }
   }
 
-  findAll() {
-    const neighborhoods = this.neighborhoodRepository.find()
-    return neighborhoods;
+  async findAll() {
+    try {
+      const neighborhoods = await this.neighborhoodRepository.find()
+      
+      return neighborhoods;
+    }
+    catch(error) {
+      throw new Error("not found")
+    }
   }
 
   findOne(id: number) {

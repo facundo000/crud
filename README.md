@@ -310,7 +310,7 @@ import { Rubro } from 'src/rubros/entities/rubro.entity';
 })
 export class ProductosModule {}
 ```
-findAll
+* findAll
 
 `marcas.service.ts`
 ```ts
@@ -336,4 +336,78 @@ async create(createBarrioDto: CreateBarrioDto) {
     return brand;
   }
 ```
+with join
 
+`producto.entity.ts`
+```ts
+    @ManyToOne(
+        () => Marca,
+        (Marca) => Marca.products
+    )
+    @JoinColumn({ name: "id_brand" })
+    id_brand: Marca;
+
+    @ManyToOne(
+        () => Rubro,
+        (Rubro) => Rubro.products
+    )
+    @JoinColumn({ name: "id" })
+    id_category: Rubro
+```
+`productos.service.ts`
+
+```ts
+findAll() {
+    const product = this.productRepository.find({
+      relations: ['id_brand', 'id_category']
+    })
+}
+```
+
+* finOne by id or name with queryBuilder
+
+`marcas.service.ts`
+```ts
+constructor(
+    @InjectRepository(Barrio)
+    private readonly neighborhoodRepository: Repository<Barrio>
+  ){}
+
+async create(createBarrioDto: CreateBarrioDto) {
+    try{
+      const neighborhood = this.neighborhoodRepository.create(createBarrioDto);
+      await this.neighborhoodRepository.save(neighborhood);
+
+      return neighborhood
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  findAll() {
+    const brand = this.brandRepository.find()
+    return brand;
+  }
+
+  async findOne(term: string) {
+    
+    let brand: Marca
+    
+    if(isUUID(term)) {
+      brand = await this.brandRepository.findOneBy({ id: term })
+    } else {
+      const queryBuilder =  this.brandRepository.createQueryBuilder();
+      brand = await queryBuilder
+        .where(` UPPER(name) =:name`, {
+          name: term.toUpperCase()
+        }).getOne();
+    }
+
+      if(!brand) {
+        throw new NotFoundException(`Brand whit id or name ${term} not found`);
+      }
+
+    return brand;
+  }
+```

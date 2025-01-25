@@ -40,8 +40,8 @@ export class ProductosProveedoresService {
 
   findAll() {
     const productsSuppliers = this.productsSuppliersRepository.find({
-      relations: ['proveedore','producto']
-    })
+      relations: ['id_suppliers', 'id_products'],
+    });
 
     return productsSuppliers;
   }

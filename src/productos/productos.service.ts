@@ -47,7 +47,9 @@ export class ProductosService {
   }
 
   findAll() {
-    const product = this.productRepository.find()
+    const product = this.productRepository.find({
+      relations: ['id_brand', 'id_category']
+    })
 
     return product;
   }

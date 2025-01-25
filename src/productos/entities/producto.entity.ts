@@ -1,7 +1,8 @@
+import { join } from "path";
 import { Marca } from "src/marcas/entities/marca.entity";
 import { ProductosProveedore } from "src/productos_proveedores/entities/productos_proveedore.entity";
 import { Rubro } from "src/rubros/entities/rubro.entity";
-import { Column, Entity, ManyToOne, NumericType, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, NumericType, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Producto {
@@ -13,15 +14,16 @@ export class Producto {
 
     @ManyToOne(
         () => Marca,
-        (Marca) => Marca.Products
-
+        (Marca) => Marca.products
     )
-    id_brand: Marca
+    @JoinColumn({ name: "id_brand" })
+    id_brand: Marca;
 
     @ManyToOne(
         () => Rubro,
         (Rubro) => Rubro.products
     )
+    @JoinColumn({ name: "id" })
     id_category: Rubro
 
     @OneToMany(
