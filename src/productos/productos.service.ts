@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ParseUUIDPipe } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Producto } from './entities/producto.entity';
 import { Repository } from 'typeorm';
 import { Marca } from 'src/marcas/entities/marca.entity';
 import { Rubro } from 'src/rubros/entities/rubro.entity';
+import { isUUID } from 'class-validator';
+
 
 @Injectable()
 export class ProductosService {
@@ -29,7 +31,7 @@ export class ProductosService {
       where: { id: id_brand }       
     })
     const categoryEntity = await this.categoryRepository.findOne({
-      where: { id: id_category }
+      where: { id_category: id_category }
     })
 
     if(!brandEntity || !categoryEntity){
@@ -54,8 +56,29 @@ export class ProductosService {
     return product;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} producto`;
+  async findOne(term: string): Promise<Producto[]> {
+    let products: Producto[]
+
+    if( isUUID(term) ){
+      products = await this.productRepository.find({
+        where: {cod_product: term},
+        relations: ['id_brand', 'id_category']
+      })
+    } else {
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      products = await queryBuilder
+        .leftJoinAndSelect('Producto.id_brand', 'brand')
+        .leftJoinAndSelect('Producto.id_category', 'category')
+        .where(`UPPER(Producto.description) LIKE :description`, {
+          description: `%${term.toUpperCase()}%`
+        }).getMany()
+    }
+
+    if(!products){
+      throw new NotFoundException(`Product with ${term} not found`)
+    }
+
+    return products;
   }
 
   update(id: number, updateProductoDto: UpdateProductoDto) {

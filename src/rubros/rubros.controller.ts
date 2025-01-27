@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { RubrosService } from './rubros.service';
 import { CreateRubroDto } from './dto/create-rubro.dto';
 import { UpdateRubroDto } from './dto/update-rubro.dto';
@@ -18,8 +18,8 @@ export class RubrosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rubrosService.findOne(+id);
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.rubrosService.findOne(id);
   }
 
   @Patch(':id')

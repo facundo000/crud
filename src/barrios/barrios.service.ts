@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBarrioDto } from './dto/create-barrio.dto';
 import { UpdateBarrioDto } from './dto/update-barrio.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Barrio } from './entities/barrio.entity';
 import { Repository } from 'typeorm';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class BarriosService {
@@ -36,8 +37,14 @@ export class BarriosService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} barrio`;
+  async findOne(id: string) {
+    const neighborhood = await this.neighborhoodRepository.findOneBy({id})
+
+    if(!neighborhood){
+      throw new NotFoundException(`neighborhood with id ${id} not found`)
+    }
+
+    return neighborhood
   }
 
   update(id: number, updateBarrioDto: UpdateBarrioDto) {

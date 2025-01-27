@@ -17,9 +17,9 @@ export class ProveedoresController {
     return this.proveedoresService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.proveedoresService.findOne(+id);
+  @Get(':term')
+  findOne(@Param('term') term: string) {
+    return this.proveedoresService.findOne(term);
   }
 
   @Patch(':id')

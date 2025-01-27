@@ -23,7 +23,7 @@ export class Producto {
         () => Rubro,
         (Rubro) => Rubro.products
     )
-    @JoinColumn({ name: "id" })
+    @JoinColumn({ name: "id_category" })
     id_category: Rubro
 
     @OneToMany(

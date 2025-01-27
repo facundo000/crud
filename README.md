@@ -351,7 +351,7 @@ with join
         () => Rubro,
         (Rubro) => Rubro.products
     )
-    @JoinColumn({ name: "id" })
+    @JoinColumn({ name: "id_category" })
     id_category: Rubro
 ```
 `productos.service.ts`
@@ -364,50 +364,64 @@ findAll() {
 }
 ```
 
-* finOne by id or name with queryBuilder
+* find by id or all with same description using queryBuilder
+
+`productos.service.ts`
+```ts
+async findByIdxDescription(term: string): Promise<Producto[]> {
+    let products: Producto[]
+
+    if( isUUID(term) ){
+      products = await this.productRepository.find({
+        where: {cod_product: term},
+        relations: ['id_brand', 'id_category']
+      })
+    } else {
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      products = await queryBuilder
+        .leftJoinAndSelect('Producto.id_brand', 'brand') //Producto.id_brand same as entity - brand is a alias
+        .leftJoinAndSelect('Producto.id_category', 'category')
+        .where(`UPPER(Producto.description) LIKE :description`, {
+          description: `%${term.toUpperCase()}%`
+        }).getMany()
+    }
+
+    if(!products){
+      throw new NotFoundException(`Product with ${term} not found`)
+    }
+
+    return products;
+  }
+```
+
+`productos.controller.ts`
+```ts
+@Get(':term')
+  findByIdxDescription(@Param('term') term: string) {
+    return this.productosService.findByIdxDescription(term);
+  }
+```
+
+* findById
 
 `marcas.service.ts`
 ```ts
-constructor(
-    @InjectRepository(Barrio)
-    private readonly neighborhoodRepository: Repository<Barrio>
-  ){}
-
-async create(createBarrioDto: CreateBarrioDto) {
-    try{
-      const neighborhood = this.neighborhoodRepository.create(createBarrioDto);
-      await this.neighborhoodRepository.save(neighborhood);
-
-      return neighborhood
-    }
-    catch (error){
-      console.log(error)
-    }
-  }
-
-  findAll() {
-    const brand = this.brandRepository.find()
-    return brand;
-  }
-
-  async findOne(term: string) {
+async findOne(id: string) {
     
-    let brand: Marca
+    const brand = await this.brandRepository.findOneBy({ id: id })
     
-    if(isUUID(term)) {
-      brand = await this.brandRepository.findOneBy({ id: term })
-    } else {
-      const queryBuilder =  this.brandRepository.createQueryBuilder();
-      brand = await queryBuilder
-        .where(` UPPER(name) =:name`, {
-          name: term.toUpperCase()
-        }).getOne();
-    }
-
-      if(!brand) {
-        throw new NotFoundException(`Brand whit id or name ${term} not found`);
+    if(!brand) {
+        throw new NotFoundException(`Brand whit id ${id} not found`);
       }
 
     return brand;
+  }
+```
+
+`marcas.controller.ts`
+```ts
+ @Get(':id')
+  findOne(@Param( 'id', ParseUUIDPipe) id: string) {
+    return this.marcasService.findOne(id);
   }
 ```

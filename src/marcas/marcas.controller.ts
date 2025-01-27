@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from
 import { MarcasService } from './marcas.service';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
+import { isUUID } from 'class-validator';
 
 @Controller('marcas')
 export class MarcasController {
@@ -17,9 +18,9 @@ export class MarcasController {
     return this.marcasService.findAll();
   }
 
-  @Get(':term')
-  findOne(@Param('term') term: string) {
-    return this.marcasService.findOne(term);
+  @Get(':id')
+  findOne(@Param( 'id', ParseUUIDPipe) id: string) {
+    return this.marcasService.findOne(id);
   }
 
   @Patch(':id')

@@ -4,7 +4,7 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "ty
 @Entity()
 export class Rubro {
     @PrimaryGeneratedColumn('uuid')
-    id:string;
+    id_category:string;
 
     @Column()
     name: string

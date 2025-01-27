@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRubroDto } from './dto/create-rubro.dto';
 import { UpdateRubroDto } from './dto/update-rubro.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Rubro } from './entities/rubro.entity';
 import { Repository } from 'typeorm';
+import { NotFoundError } from 'rxjs';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class RubrosService {
@@ -21,13 +23,19 @@ export class RubrosService {
   }
 
   findAll() {
-    const category = this.categoryRepository.find()
+    let category = this.categoryRepository.find()
 
     return category;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rubro`;
+  async findOne(id: string) {    
+      const category = await this.categoryRepository.findOneBy({id_category: id })
+
+      if(!category){
+        throw new NotFoundException(`category with id ${category} not found`)
+      }
+
+      return category    
   }
 
   update(id: number, updateRubroDto: UpdateRubroDto) {

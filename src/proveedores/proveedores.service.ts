@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProveedoreDto } from './dto/create-proveedore.dto';
 import { UpdateProveedoreDto } from './dto/update-proveedore.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Proveedore } from './entities/proveedore.entity';
 import { Repository } from 'typeorm';
 import { Barrio } from 'src/barrios/entities/barrio.entity';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ProveedoresService {
@@ -43,8 +44,28 @@ export class ProveedoresService {
     return suppliers;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} proveedore`;
+  async findOne(term: string): Promise<Proveedore[]> {
+    let proveedores: Proveedore[]
+
+    if(isUUID(term)){
+      proveedores = await this.suppliersRepository.find({
+        where: {cod_prov: term},
+        relations: ['id_neighborhood']
+      })
+    } else {
+      const queryBuilder = this.suppliersRepository.createQueryBuilder();
+      proveedores = await queryBuilder
+      .leftJoinAndSelect('Proveedore.id_neighborhood', 'neighborhood')
+      .where(`UPPER(Proveedore.name) LIKE :name`, {
+        name: `%${term.toUpperCase()}%`
+      }).getMany()
+    }
+
+    if(!proveedores){
+      throw new NotFoundException(`proveedores with ${term} not found`)
+    }
+
+    return proveedores;
   }
 
   update(id: number, updateProveedoreDto: UpdateProveedoreDto) {

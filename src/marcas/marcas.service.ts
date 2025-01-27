@@ -32,22 +32,12 @@ export class MarcasService {
     return brand;
   }
 
-  async findOne(term: string) {
+  async findOne(id: string) {
     
-    let brand: Marca
+    const brand = await this.brandRepository.findOneBy({ id: id })
     
-    if(isUUID(term)) {
-      brand = await this.brandRepository.findOneBy({ id: term })
-    } else {
-      const queryBuilder =  this.brandRepository.createQueryBuilder();
-      brand = await queryBuilder
-        .where(` UPPER(name) =:name`, {
-          name: term.toUpperCase()
-        }).getOne();
-    }
-
-      if(!brand) {
-        throw new NotFoundException(`Brand whit id or name ${term} not found`);
+    if(!brand) {
+        throw new NotFoundException(`Brand whit id ${id} not found`);
       }
 
     return brand;

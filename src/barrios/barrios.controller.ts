@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { BarriosService } from './barrios.service';
 import { CreateBarrioDto } from './dto/create-barrio.dto';
 import { UpdateBarrioDto } from './dto/update-barrio.dto';
@@ -18,8 +18,8 @@ export class BarriosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.barriosService.findOne(+id);
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.barriosService.findOne(id);
   }
 
   @Patch(':id')
