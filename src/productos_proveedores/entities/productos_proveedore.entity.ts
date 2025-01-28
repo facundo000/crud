@@ -9,14 +9,16 @@ export class ProductosProveedore {
 
     @ManyToOne(
         () => Proveedore,
-        (Proveedore) => Proveedore.products_suppliers
+        (Proveedore) => Proveedore.products_suppliers,
+        {onDelete: 'CASCADE'}
     )
     @JoinColumn({ name: "cod_prov" })
     id_suppliers: Proveedore
 
     @ManyToOne(
         () => Producto,
-        (Producto) => Producto.products_suppliers
+        (Producto) => Producto.products_suppliers,
+        {onDelete: 'CASCADE'}
     )
     @JoinColumn({ name: "cod_product" })
     id_products: Producto

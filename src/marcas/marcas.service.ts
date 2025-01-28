@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { Marca } from './entities/marca.entity';
 import { Repository } from 'typeorm';
 import { NotFoundError } from 'rxjs';
 import { isUUID } from 'class-validator';
+import { error } from 'console';
 
 @Injectable()
 export class MarcasService {
@@ -43,11 +44,32 @@ export class MarcasService {
     return brand;
   }
 
-  update(id: number, updateMarcaDto: UpdateMarcaDto) {
-    return `This action updates a #${id} marca`;
+  async update(id: string, updateMarcaDto: UpdateMarcaDto) {
+    const brand = await this.brandRepository.preload({
+      id:id,
+      ...updateMarcaDto      
+    })
+    if(!brand) {
+      throw new NotFoundException(`brand with id: ${brand} not found`)
+    }
+
+    try{
+      await this.brandRepository.save(brand);
+
+      return brand
+    } catch (error) {
+      if(error.code === '23505')
+        throw new BadRequestException(error.detail)
+
+      throw new InternalServerErrorException('Unexpeted error, check server logs')
+    }
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} marca`;
+  async remove(id: string) {
+    const brand = await this.findOne(id);
+    await this.brandRepository.remove(brand)
+
+    return true
   }
 }

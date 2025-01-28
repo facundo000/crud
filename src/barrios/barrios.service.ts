@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Barrio } from './entities/barrio.entity';
 import { Repository } from 'typeorm';
 import { NotFoundError } from 'rxjs';
+import { error } from 'console';
 
 @Injectable()
 export class BarriosService {
@@ -47,11 +48,30 @@ export class BarriosService {
     return neighborhood
   }
 
-  update(id: number, updateBarrioDto: UpdateBarrioDto) {
-    return `This action updates a #${id} barrio`;
+  async update(id: string, updateBarrioDto: UpdateBarrioDto) {
+    const neighborhood = await this.neighborhoodRepository.preload({
+      id: id,
+      ...updateBarrioDto
+    })
+
+    if(!neighborhood){
+      throw new NotFoundException(`neighborhood with id: ${neighborhood} not found`)
+    }
+
+    try {
+      await this.neighborhoodRepository.save(neighborhood);
+
+      return neighborhood;
+    } catch (error) {
+      throw new Error(`${error}`)
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} barrio`;
+  async remove(id: string) {
+
+    const neighborhood = await this.findOne(id);
+    await this.neighborhoodRepository.remove(neighborhood)
+
+    return true;
   }
 }

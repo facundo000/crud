@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ParseUUIDPipe } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, ParseUUIDPipe } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
@@ -56,6 +56,16 @@ export class ProductosService {
     return product;
   }
 
+  async finOneById(id: string) {
+    const product = await this.productRepository.findOneBy({ cod_product:id })
+
+    if(!product) {
+      throw new NotFoundException(`Product with id ${id} not found`)
+    }
+
+    return product
+  }
+
   async findOne(term: string): Promise<Producto[]> {
     let products: Producto[]
 
@@ -79,13 +89,37 @@ export class ProductosService {
     }
 
     return products;
+  }  
+
+  async update(id: string, updateProductoDto: UpdateProductoDto) {
+    
+    const product = await this.productRepository.preload({
+      cod_product:id,
+      ...updateProductoDto
+    })
+
+    if(!product){
+      throw new NotFoundException(`product with id: ${id} not found`)
+    }
+
+    try{
+      this.productRepository.save(product);
+
+      return product;
+    } catch (error) {
+      if(error.code === '23505'){
+        throw new BadRequestException(error.detail)
+      }
+
+      throw new InternalServerErrorException('Unexpeted error, check server logs')
+    }
+  
   }
 
-  update(id: number, updateProductoDto: UpdateProductoDto) {
-    return `This action updates a #${id} producto`;
-  }
+  async remove(id: string) {
+    const products = await this.finOneById(id)
+    await this.productRepository.remove(products)
 
-  remove(id: number) {
-    return `This action removes a #${id} producto`;
+    return true;
   }
 }

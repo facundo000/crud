@@ -44,35 +44,48 @@ export class ProveedoresService {
     return suppliers;
   }
 
+  async finOneById(id: string) {
+    const supplier = await this.suppliersRepository.findOneBy({ cod_prov:id })
+
+    if(!supplier) {
+      throw new NotFoundException(`Product with id ${id} not found`)
+    }
+
+    return supplier
+  }
+
   async findOne(term: string): Promise<Proveedore[]> {
-    let proveedores: Proveedore[]
+    let suppliers: Proveedore[]
 
     if(isUUID(term)){
-      proveedores = await this.suppliersRepository.find({
+      suppliers = await this.suppliersRepository.find({
         where: {cod_prov: term},
         relations: ['id_neighborhood']
       })
     } else {
       const queryBuilder = this.suppliersRepository.createQueryBuilder();
-      proveedores = await queryBuilder
+      suppliers = await queryBuilder
       .leftJoinAndSelect('Proveedore.id_neighborhood', 'neighborhood')
       .where(`UPPER(Proveedore.name) LIKE :name`, {
         name: `%${term.toUpperCase()}%`
       }).getMany()
     }
 
-    if(!proveedores){
-      throw new NotFoundException(`proveedores with ${term} not found`)
+    if(!suppliers){
+      throw new NotFoundException(`suppliers with ${term} not found`)
     }
 
-    return proveedores;
+    return suppliers;
   }
 
   update(id: number, updateProveedoreDto: UpdateProveedoreDto) {
     return `This action updates a #${id} proveedore`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} proveedore`;
+  async remove(id: string) {
+    const supplier = await this.finOneById(id)
+    await this.suppliersRepository.remove(supplier)
+
+    return true;
   }
 }

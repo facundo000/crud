@@ -425,3 +425,73 @@ async findOne(id: string) {
     return this.marcasService.findOne(id);
   }
 ```
+
+* remove 
+
+with fk in other table
+
+`producto.entity.ts`
+```ts
+@ManyToOne(
+        () => Marca,
+        (Marca) => Marca.products,
+        {onDelete:'CASCADE'}
+    )
+    @JoinColumn({ name: "id_brand" })
+    id_brand: Marca;
+```
+`marcas.controller.ts`
+```ts
+@Delete(':id')
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.marcasService.remove(id);
+  }
+```
+
+`marcas.service.ts`
+```ts
+async remove(id: string) {
+    const brand = await this.findOne(id);
+    await this.brandRepository.remove(brand)
+
+    return true
+  }
+```
+
+* update
+
+`marcas.controller.ts`
+```ts
+@Patch(':id')
+  update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() updateMarcaDto: UpdateMarcaDto
+  ) {
+    return this.marcasService.update(id, updateMarcaDto);
+  }
+```
+
+`marcas.service.ts`
+```ts
+async update(id: string, updateMarcaDto: UpdateMarcaDto) {
+    const brand = await this.brandRepository.preload({
+      id:id,
+      ...updateMarcaDto      
+    })
+    if(!brand) {
+      throw new NotFoundException(`brand with id: ${brand} not found`)
+    }
+
+    try{
+      await this.brandRepository.save(brand);
+
+      return brand
+    } catch (error) {
+      if(error.code === '23505')
+        throw new BadRequestException(error.detail)
+
+      throw new InternalServerErrorException('Unexpeted error, check server logs')
+    }
+
+  }
+```

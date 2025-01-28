@@ -24,12 +24,15 @@ export class MarcasController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMarcaDto: UpdateMarcaDto) {
-    return this.marcasService.update(+id, updateMarcaDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() updateMarcaDto: UpdateMarcaDto
+  ) {
+    return this.marcasService.update(id, updateMarcaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.marcasService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.marcasService.remove(id);
   }
 }

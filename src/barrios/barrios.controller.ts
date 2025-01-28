@@ -23,12 +23,15 @@ export class BarriosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBarrioDto: UpdateBarrioDto) {
-    return this.barriosService.update(+id, updateBarrioDto);
+  update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() updateBarrioDto: UpdateBarrioDto
+  ) {
+    return this.barriosService.update(id, updateBarrioDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.barriosService.remove(+id);
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.barriosService.remove(id);
   }
 }

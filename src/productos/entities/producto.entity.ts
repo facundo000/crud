@@ -14,7 +14,8 @@ export class Producto {
 
     @ManyToOne(
         () => Marca,
-        (Marca) => Marca.products
+        (Marca) => Marca.products,
+        {onDelete:'CASCADE'}
     )
     @JoinColumn({ name: "id_brand" })
     id_brand: Marca;
