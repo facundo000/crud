@@ -6,7 +6,7 @@ export class Rubro {
     @PrimaryGeneratedColumn('uuid')
     id_category:string;
 
-    @Column()
+    @Column( {unique: true})    
     name: string
 
     @OneToMany(

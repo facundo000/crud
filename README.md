@@ -495,3 +495,48 @@ async update(id: string, updateMarcaDto: UpdateMarcaDto) {
 
   }
 ```
+with relations N vs 1
+
+`productos.service.ts`
+```ts
+async update(id: string, updateProductoDto: UpdateProductoDto) {
+    
+    const { id_brand, id_category, ...rest } = updateProductoDto
+
+    const product = await this.productRepository.preload({
+      cod_product:id,
+      ...rest
+    })
+
+    const brand = await this.brandRepository.findOne({
+       where: {id: id_brand}
+      })
+      product.id_brand = brand
+
+    const category = await this.categoryRepository.findOne({
+      where: { id_category }
+    })
+    product.id_category = category
+
+    if( !brand || !category ){
+      throw new NotFoundException(`id_brand or id_category not found`)
+    }
+
+    if(!product){
+      throw new NotFoundException(`product with id: ${id} not found`)
+    }
+
+    try{
+      this.productRepository.save(product);
+
+      return product;
+    } catch (error) {
+      if(error.code === '23505'){
+        throw new BadRequestException(error.detail)
+      }
+
+      throw new InternalServerErrorException('Unexpeted error, check server logs')
+    }
+  
+  }
+```

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateRubroDto } from './dto/create-rubro.dto';
 import { UpdateRubroDto } from './dto/update-rubro.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -38,8 +38,26 @@ export class RubrosService {
       return category    
   }
 
-  update(id: number, updateRubroDto: UpdateRubroDto) {
-    return `This action updates a #${id} rubro`;
+  async update(id: string, updateRubroDto: UpdateRubroDto) {
+    const category = await this.categoryRepository.preload({
+      id_category: id,
+      ...updateRubroDto
+    })
+
+    if(!category){
+      throw new NotFoundException(`category with id: ${category} not found`);
+    }
+
+    try {
+      await this.categoryRepository.save(category);
+
+      return category;
+    } catch (error){
+      if(error.code === '23505'){
+        throw new BadRequestException(error.detail)
+      }
+      throw new InternalServerErrorException('Unexpeted error, check server logs')
+    }
   }
 
   remove(id: number) {

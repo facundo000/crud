@@ -29,9 +29,12 @@ export class Proveedore {
     )
     products_suppliers: ProductosProveedore
 
-    @Column('text')
+    @Column('text', {unique: true})
     phone: string
 
-    @Column({nullable: true})
+    @Column({
+        nullable: true,
+        unique: true
+    })
     mail?: string
 }

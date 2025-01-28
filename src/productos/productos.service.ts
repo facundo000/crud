@@ -93,10 +93,26 @@ export class ProductosService {
 
   async update(id: string, updateProductoDto: UpdateProductoDto) {
     
+    const { id_brand, id_category, ...rest } = updateProductoDto
+
     const product = await this.productRepository.preload({
       cod_product:id,
-      ...updateProductoDto
+      ...rest
     })
+
+    const brand = await this.brandRepository.findOne({
+       where: {id: id_brand}
+      })
+      product.id_brand = brand
+
+    const category = await this.categoryRepository.findOne({
+      where: { id_category }
+    })
+    product.id_category = category
+
+    if( !brand || !category ){
+      throw new NotFoundException(`id_brand or id_category not found`)
+    }
 
     if(!product){
       throw new NotFoundException(`product with id: ${id} not found`)

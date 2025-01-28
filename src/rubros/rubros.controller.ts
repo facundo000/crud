@@ -23,8 +23,8 @@ export class RubrosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRubroDto: UpdateRubroDto) {
-    return this.rubrosService.update(+id, updateRubroDto);
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateRubroDto: UpdateRubroDto) {
+    return this.rubrosService.update(id, updateRubroDto);
   }
 
   @Delete(':id')
